@@ -16,14 +16,6 @@ GLFWwindow* WindowStart(int ScreenWidth, int ScreenHeight, const char* WindowNam
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    // glad: load all OpenGL function pointers
-    // ---------------------------------------
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return NULL;
-    }
-
     return window;
 }
 
