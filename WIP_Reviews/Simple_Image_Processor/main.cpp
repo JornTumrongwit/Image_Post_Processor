@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 
 #include <Display.h>
-#include <Application.h>
+#include <Shader.h>
 #include <Geometry.h>
 #include <iostream>
 
@@ -39,30 +39,37 @@ int main()
         return NULL;
     }
 
-    unsigned int shaderProgram = LinkShaders("SimpleVertexShader.vs", "SimpleFragmentShader.fs");
+    Shader ourShader = Shader();
+    ourShader.LinkShaders("SimpleVertexShader.vs", "SimpleFragmentShader.fs");
 
+    Geometry geoms = Geometry();
     unsigned int VAO, VBO, EBO;
-    BindTriangle(&VAO, &VBO, &EBO);
+    geoms.BindGeoms(&VAO, &VBO, &EBO, 1.0f, -1.0f);
 
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
         // input
-        // -----
         processInput(window);
 
         // render
-        // ------
+        // clear the colorbuffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // draw our first triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
+        // be sure to activate the shader
+        ourShader.use();
+
+        // update the uniform color
+        float timeValue = glfwGetTime();
+        float greenValue = sin(timeValue) / 2.0f + 0.5f;
+        ourShader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 0.0f);
+
+        // render the triangle
+        ourShader.use();
+        glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time 
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -70,8 +77,21 @@ int main()
         glfwPollEvents();
     }
 
+    // optional: de-allocate all resources once they've outlived their purpose:
+    // ------------------------------------------------------------------------
+    glDeleteVertexArrays(1, &VAO);
+    glDeleteBuffers(1, &VBO);
+
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
     return 0;
+}
+
+// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
+// ---------------------------------------------------------------------------------------------------------
+void processInput(GLFWwindow* window)
+{
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 }
