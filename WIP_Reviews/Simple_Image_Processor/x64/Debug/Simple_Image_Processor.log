@@ -1,3 +1,0 @@
-﻿  main.cpp
-C:\Users\User\Documents\photo_gened\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\main.cpp(65,25): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-  Simple_Image_Processor.vcxproj -> C:\Users\User\Documents\photo_gened\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\x64\Debug\Simple_Image_Processor.exe
