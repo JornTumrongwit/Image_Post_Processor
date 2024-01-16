@@ -58,11 +58,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="SimpleFragmentShader.fs">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="SimpleVertexShader.vs">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="SelectiveDesat.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SimpleFragmentShader.fs">
+      <Filter>Shader Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>
