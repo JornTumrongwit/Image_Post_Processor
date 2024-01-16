@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LibraryPath>C:\Users\User\Documents\photo_gened\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor;C:\Users\User\Documents\photo_gened\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\OGL\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\User\Documents\photo_gened\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor;C:\Users\User\Documents\photo_gened\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\OGL\includes;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\UX371\Documents\Photoclass\ICGH118 Final Assignment\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor;C:\Users\UX371\Documents\Photoclass\ICGH118 Final Assignment\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\OGL\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\UX371\Documents\Photoclass\ICGH118 Final Assignment\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\OGL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -136,6 +136,8 @@
     <ClInclude Include="Geometry.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="Display.h" />
+    <ClInclude Include="stb_image.h" />
+    <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Shader.cpp" />
@@ -143,6 +145,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OGL\includes\glad.c" />
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleFragmentShader.fs" />

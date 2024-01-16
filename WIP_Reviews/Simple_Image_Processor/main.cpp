@@ -4,6 +4,7 @@
 #include <Display.h>
 #include <Shader.h>
 #include <Geometry.h>
+#include <texture.h>
 #include <iostream>
 
 void processInput(GLFWwindow* window);
@@ -46,6 +47,13 @@ int main()
     unsigned int VAO, VBO, EBO;
     geoms.BindGeoms(&VAO, &VBO, &EBO, 1.0f, -1.0f);
 
+    unsigned int texture1;
+    Texture texture = Texture();
+    texture.BindTexture(&texture1, "./img/sample.jpg");
+
+    // be sure to activate the shader
+    ourShader.use();
+    ourShader.setInt("texture1", 0);
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
