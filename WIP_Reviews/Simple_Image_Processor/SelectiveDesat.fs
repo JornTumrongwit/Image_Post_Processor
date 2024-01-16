@@ -13,7 +13,7 @@ uniform sampler2D texture1;
 vec3 fullDesaturate = vec3(0.0);
 //----------Variables----------------------
 //the value of the saturation
-vec3 Saturation = vec3(1.0, 0.1, 0.0);
+vec3 Saturation = vec3(1.0, 0.0, 0.0);
 
 //degree of freedom
 float freedom = 1.;

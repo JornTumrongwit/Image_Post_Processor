@@ -71,8 +71,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\UX371\Documents\Photoclass\ICGH118 Final Assignment\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor;C:\Users\UX371\Documents\Photoclass\ICGH118 Final Assignment\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\OGL\includes;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\UX371\Documents\Photoclass\ICGH118 Final Assignment\Image_Post_Processor\WIP_Reviews\Simple_Image_Processor\OGL\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>.\;.\OGL\includes;$(IncludePath)</IncludePath>
+    <LibraryPath>.\OGL\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

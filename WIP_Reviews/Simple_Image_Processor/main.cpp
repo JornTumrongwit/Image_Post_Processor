@@ -49,7 +49,7 @@ int main()
 
     unsigned int texture1;
     Texture texture = Texture();
-    texture.BindTexture(&texture1, "./img/sample.jpg");
+    texture.BindTexture(&texture1, "./img/clubexpo.jpg");
 
     // be sure to activate the shader
     ourShader.use();
