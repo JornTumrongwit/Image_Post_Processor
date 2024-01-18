@@ -41,7 +41,7 @@ int main()
     }
 
     Shader ourShader = Shader();
-    ourShader.LinkShaders("SimpleVertexShader.vs", "SelectiveDesat.fs");
+    ourShader.LinkShaders("SimpleVertexShader.vs", "SimpleFragmentShader.fs");
 
     Geometry geoms = Geometry();
     unsigned int VAO, VBO, EBO;

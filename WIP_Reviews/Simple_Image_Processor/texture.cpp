@@ -5,7 +5,7 @@
 #include <texture.h>
 #include <iostream>
 
-void Texture::BindTexture(unsigned int* texture, const char* file)
+void Texture::BindTexture(unsigned int* texture, const char* file, bool hdr)
 {
 	// texture 
 	// ---------
@@ -24,7 +24,8 @@ void Texture::BindTexture(unsigned int* texture, const char* file)
 	unsigned char* data = stbi_load(file, &width, &height, &nrChannels, 0);
 	if (data)
 	{
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	hdr?glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data):
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else

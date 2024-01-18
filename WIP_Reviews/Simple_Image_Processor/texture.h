@@ -4,5 +4,5 @@
 class Texture 
 {
 public:
-	void BindTexture(unsigned int* texture, const char* file);
+	void BindTexture(unsigned int* texture, const char* file, bool hdr=true);
 };

@@ -10,7 +10,7 @@ uniform sampler2D texture1;
 // Selective Desaturation
 
 //----------Constant-----------------------
-vec3 fullDesaturate = vec3(0.0);
+const vec3 fullDesaturate = vec3(0.0);
 //----------Variables----------------------
 //the value of the saturation
 vec3 Saturation = vec3(1.0, 0.0, 0.0);
@@ -56,6 +56,7 @@ void main(){
   FragColor.rgb=Fetch(pos, vec2(0, 0)).rgb;
   //fragColor.rgb = fragColor.rgb;
   FragColor.rgb = Desaturate(FragColor.rgb);
+  //FragColor = FragColor / ( FragColor +vec4(1.0f));
   FragColor.a=1.0;
   FragColor.rgb=ToSrgb(FragColor.rgb);
 }
