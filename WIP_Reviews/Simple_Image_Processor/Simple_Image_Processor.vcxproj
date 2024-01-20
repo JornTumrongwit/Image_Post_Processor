@@ -134,7 +134,6 @@
   <ItemGroup>
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Geometry.h" />
-    <ClInclude Include="main.h" />
     <ClInclude Include="Display.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="texture.h" />
@@ -151,6 +150,8 @@
     <Text Include="SimpleFragmentShader.fs">
       <FileType>Document</FileType>
     </Text>
+    <None Include="FrameBuffer.fs" />
+    <None Include="FrameBuffer.vs" />
     <None Include="SelectiveDesat.fs" />
     <None Include="SimpleVertexShader.vs" />
   </ItemGroup>

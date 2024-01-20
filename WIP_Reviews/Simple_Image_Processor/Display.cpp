@@ -15,7 +15,7 @@ GLFWwindow* WindowStart(int ScreenWidth, int ScreenHeight, const char* WindowNam
     }
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
+    glfwSetWindowAspectRatio(window, ScreenWidth, ScreenHeight);
     return window;
 }
 
