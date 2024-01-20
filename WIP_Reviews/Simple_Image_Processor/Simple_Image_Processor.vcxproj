@@ -106,7 +106,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -144,6 +144,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OGL\includes\glad.c" />
     <ClCompile Include="Display.cpp" />
+    <ClCompile Include="stb_image_write.h" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>

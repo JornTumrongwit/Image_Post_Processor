@@ -6,10 +6,14 @@
 #include <Geometry.h>
 #include <texture.h>
 #include <iostream>
+#include <fstream>
+#include <vector>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image.h"
+#include "stb_image_write.h"
 
-void processInput(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO);
-void SaveImage(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO);
+void processInput(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO, Shader frameShader, unsigned int quadVAO, unsigned int texture1, unsigned int textureColorbuffer);
+void SaveImage(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO, unsigned int texture1);
 
 // settings
 int SCR_WIDTH = 5472;
@@ -21,8 +25,8 @@ bool saved = false;
 
 float aspectRatio = SCR_WIDTH / SCR_HEIGHT; 
 
-const char* img = "./img/GBVSRR.jpg";
-const char* target = "./imgresult/GBVSRR.jpg";
+const char* img = "./img/cluttereditems.jpg";
+const char* target = "./imgresult/cluttereditems.png";
 
 int* buffer = new int[SCR_WIDTH * SCR_HEIGHT * 3];
 
@@ -85,7 +89,7 @@ int main()
     unsigned int textureColorbuffer;
     glGenTextures(1, &textureColorbuffer);
     glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, display_width, display_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_width, display_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
@@ -100,13 +104,37 @@ int main()
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     
+    // saveBuffer configuration
+    // -------------------------
+    unsigned int savebuffer;
+    glGenFramebuffers(1, &savebuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, savebuffer);
+    // create a color attachment texture
+    unsigned int texturesaveColorbuffer;
+    glGenTextures(1, &texturesaveColorbuffer);
+    glBindTexture(GL_TEXTURE_2D, texturesaveColorbuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texturesaveColorbuffer, 0);
+    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+    unsigned int saverbo;
+    glGenRenderbuffers(1, &saverbo);
+    glBindRenderbuffer(GL_RENDERBUFFER, saverbo);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, saverbo); // now actually attach it
+    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
         // input
+        processInput(window, savebuffer, ourShader, VAO, frameShader, quadVAO, texture1, texturesaveColorbuffer);
         glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-        processInput(window, framebuffer, ourShader, VAO);
 
         // render
         // clear the colorbuffer
@@ -143,6 +171,8 @@ int main()
     glDeleteBuffers(1, &VBO);
     glDeleteFramebuffers(1, &framebuffer);
     glDeleteFramebuffers(1, &rbo);
+    glDeleteFramebuffers(1, &savebuffer);
+    glDeleteFramebuffers(1, &saverbo);
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
@@ -152,41 +182,43 @@ int main()
 
 // process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
 // ---------------------------------------------------------------------------------------------------------
-void processInput(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO)
+void processInput(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO, Shader frameShader, unsigned int quadVAO, unsigned int texture1, unsigned int textureColorbuffer)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && !saved)
-        SaveImage(window, framebuffer, ourShader, VAO);
+        SaveImage(window, framebuffer, ourShader, VAO, texture1);
 }
 
 // save the image
 // --------------
-void SaveImage(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO)
+void SaveImage(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO, unsigned int texture1)
 {
     saved = true;
-    std::cout << "SAVING";
-    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
-    // input
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
 
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     // render
     // clear the colorbuffer
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    // be sure to activate the shader
-    ourShader.use();
-
-    // update the uniform color
-    float timeValue = glfwGetTime();
-    float greenValue = sin(timeValue) / 2.0f + 0.5f;
-    ourShader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 0.0f);
-
     // render the triangle
     ourShader.use();
     glBindVertexArray(VAO);
+    glBindTexture(GL_TEXTURE_2D, texture1);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    return;
+    glBindVertexArray(0);
+
+    GLsizei nrChannels = 3;
+    GLsizei stride = nrChannels * SCR_WIDTH;
+    stride += (stride % 4) ? (4 - stride % 4) : 0;
+    GLsizei bufferSize = stride * SCR_HEIGHT;
+    std::vector<char> buffer(bufferSize);
+    glPixelStorei(GL_PACK_ALIGNMENT, 4);
+    glReadBuffer(framebuffer);
+    glReadPixels(0, 0, SCR_WIDTH, SCR_HEIGHT, GL_RGB, GL_UNSIGNED_BYTE, buffer.data());
+    stbi_flip_vertically_on_write(true);
+    stbi_write_png(target, SCR_WIDTH, SCR_HEIGHT, nrChannels, buffer.data(), stride);
+    std::cout << "saved";
 }

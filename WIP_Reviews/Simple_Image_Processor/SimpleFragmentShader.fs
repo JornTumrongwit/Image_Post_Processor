@@ -1,5 +1,5 @@
 #version 330 core
-out vec4 FragColor;
+out vec3 FragColor;
 
 in vec3 ourColor;
 in vec2 TexCoord;
@@ -44,9 +44,10 @@ vec3 ACESFitted(vec3 color)
 }
 void main()
 {
+    /*
     FragColor.rgb = pow(FragColor.rgb, vec3(0.833));
     FragColor.rgb *= 1.07;
 	FragColor.rgb = ACESFitted(texture(texture1, TexCoord).rgb);
-    //FragColor.rgb = texture(texture1, TexCoord).rgb;
-    FragColor.a = 1.0;
+    */
+    FragColor.rgb = texture(texture1, TexCoord).rgb;
 }
