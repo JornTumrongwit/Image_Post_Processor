@@ -25,8 +25,8 @@ bool saved = false;
 
 float aspectRatio = SCR_WIDTH / SCR_HEIGHT; 
 
-const char* img = "./img/cluttereditems.jpg";
-const char* target = "./imgresult/cluttereditems.png";
+const char* img = "./img/GBVSRR.jpg";
+const char* target = "./imgresult/GBVSRR.png";
 
 int* buffer = new int[SCR_WIDTH * SCR_HEIGHT * 3];
 
