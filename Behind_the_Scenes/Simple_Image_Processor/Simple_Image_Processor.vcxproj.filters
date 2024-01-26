@@ -33,6 +33,9 @@
     <ClInclude Include="texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FrameBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OGL\includes\glad.c">
@@ -56,6 +59,9 @@
     <ClCompile Include="stb_image_write.h">
       <Filter>Header Files</Filter>
     </ClCompile>
+    <ClCompile Include="FrameBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleVertexShader.vs">
@@ -73,7 +79,9 @@
     <None Include="redcrack.fs">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="purplegrass.fs" />
+    <None Include="purplegrass.fs">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="SimpleFragmentShader.fs">

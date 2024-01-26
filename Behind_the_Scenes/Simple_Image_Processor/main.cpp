@@ -5,6 +5,7 @@
 #include <Shader.h>
 #include <Geometry.h>
 #include <texture.h>
+#include <FrameBuffer.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -82,59 +83,19 @@ int main()
 
     // framebuffer configuration
     // -------------------------
-    unsigned int framebuffer;
-    glGenFramebuffers(1, &framebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    // create a color attachment texture
-    unsigned int textureColorbuffer;
-    glGenTextures(1, &textureColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, display_width, display_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorbuffer, 0);
-    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    unsigned int rbo;
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, display_width, display_height); // use a single renderbuffer object for both a depth AND stencil buffer.
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    FrameBuffer displayBuffer = FrameBuffer(display_width, display_height);
     
     // saveBuffer configuration
     // -------------------------
-    unsigned int savebuffer;
-    glGenFramebuffers(1, &savebuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, savebuffer);
-    // create a color attachment texture
-    unsigned int texturesaveColorbuffer;
-    glGenTextures(1, &texturesaveColorbuffer);
-    glBindTexture(GL_TEXTURE_2D, texturesaveColorbuffer);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texturesaveColorbuffer, 0);
-    // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    unsigned int saverbo;
-    glGenRenderbuffers(1, &saverbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, saverbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCR_WIDTH, SCR_HEIGHT); // use a single renderbuffer object for both a depth AND stencil buffer.
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, saverbo); // now actually attach it
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    FrameBuffer savebuffer = FrameBuffer(SCR_WIDTH, SCR_HEIGHT);
 
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
     {
         // input
-        processInput(window, savebuffer, ourShader, VAO, frameShader, quadVAO, texture1, texturesaveColorbuffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        processInput(window, savebuffer.frameBuffer, ourShader, VAO, frameShader, quadVAO, texture1, savebuffer.texture);
+        glBindFramebuffer(GL_FRAMEBUFFER, displayBuffer.frameBuffer);
 
         // render
         // clear the colorbuffer
@@ -155,7 +116,7 @@ int main()
         frameShader.use();
         glBindVertexArray(quadVAO);
         glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
+        glBindTexture(GL_TEXTURE_2D, displayBuffer.texture);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         
@@ -169,10 +130,8 @@ int main()
     // ------------------------------------------------------------------------
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteFramebuffers(1, &rbo);
-    glDeleteFramebuffers(1, &savebuffer);
-    glDeleteFramebuffers(1, &saverbo);
+    displayBuffer.DeleteBuffers();
+    savebuffer.DeleteBuffers();
 
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
