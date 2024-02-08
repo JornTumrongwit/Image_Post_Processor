@@ -23,13 +23,24 @@ int display_width = 1500;
 int display_height = 1000;
 
 bool saved = false;
+bool bloom = true;
 
 float aspectRatio = SCR_WIDTH / SCR_HEIGHT; 
 
-const char* img = "./img/crackeddirt.jpg";
-const char* target = "./imgresult/crackeddirt.png";
+const char* img = "./img/strawberry.jpg";
+const char* target = "./imgresult/strawberry.png";
 
 int* buffer = new int[SCR_WIDTH * SCR_HEIGHT * 3];
+unsigned int quadVAO, quadVBO;
+
+void drawQuads() {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glBindVertexArray(quadVAO);
+    glDisable(GL_DEPTH_TEST);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+}
 
 int main()
 {
@@ -65,13 +76,16 @@ int main()
     Geometry geoms = Geometry();
     unsigned int VAO, VBO, EBO;
     geoms.BindGeoms(&VAO, &VBO, &EBO, 1.0f, -1.0f);
-    unsigned int quadVAO, quadVBO;
     geoms.BindQuad(&quadVAO, &quadVBO);
 
     Shader ourShader = Shader();
-    ourShader.LinkShaders("SimpleVertexShader.vs", "redcrack.fs");
+    ourShader.LinkShaders("SimpleVertexShader.vs", "strawberry.fs");
     Shader frameShader = Shader();
     frameShader.LinkShaders("FrameBuffer.vs", "FrameBuffer.fs");
+    Shader shaderBlur = Shader();
+    if (bloom == true) {
+        shaderBlur.LinkShaders("FrameBuffer.vs", "blur.fs");
+    }
 
     unsigned int texture1;
     Texture texture = Texture();
@@ -88,6 +102,30 @@ int main()
     // saveBuffer configuration
     // -------------------------
     FrameBuffer savebuffer = FrameBuffer(SCR_WIDTH, SCR_HEIGHT);
+
+    // buffer for blooms
+    // -----------------
+    unsigned int pingpongFBO[2];
+    unsigned int pingpongBuffer[2];
+    if (bloom == true) {
+        glGenFramebuffers(2, pingpongFBO);
+        glGenTextures(2, pingpongBuffer);
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
+            glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+            glTexImage2D(
+                GL_TEXTURE_2D, 0, GL_RGBA16F, display_width, display_height, 0, GL_RGBA, GL_FLOAT, NULL
+            );
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
+            );
+        }
+    }
 
     // render loop
     // -----------
@@ -107,16 +145,35 @@ int main()
         glBindTexture(GL_TEXTURE_2D, texture1);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
+
+        bool horizontal = true, first_iteration = true;
+        //pingpong
+        // if we are applying bloom
+        if (bloom == true) {
+            int amount = 10;
+            shaderBlur.use();
+            for (unsigned int i = 0; i < amount; i++)
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+                glBindTexture(
+                    GL_TEXTURE_2D, first_iteration ? displayBuffer.texture : pingpongBuffer[!horizontal]
+                );
+                drawQuads();
+                horizontal = !horizontal;
+                if (first_iteration) first_iteration = false;
+            }
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            std::cout << pingpongFBO[0] << " " << pingpongFBO[1]<<"\n";
+        }
         
         // second pass
         glBindFramebuffer(GL_FRAMEBUFFER, 0); // back to default
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-
         frameShader.use();
         glBindVertexArray(quadVAO);
         glDisable(GL_DEPTH_TEST);
-        glBindTexture(GL_TEXTURE_2D, displayBuffer.texture);
+        glBindTexture(GL_TEXTURE_2D, bloom? pingpongBuffer[!horizontal]: displayBuffer.texture);
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
         

@@ -62,6 +62,9 @@
     <ClCompile Include="FrameBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="blurtest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleVertexShader.vs">
@@ -80,6 +83,30 @@
       <Filter>Shader Files</Filter>
     </None>
     <None Include="purplegrass.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="p3moon.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="moon2.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="moonburst.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="flowingbark.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="churningwaves.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="strawberry.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="bufferbloom.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="blur.fs">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

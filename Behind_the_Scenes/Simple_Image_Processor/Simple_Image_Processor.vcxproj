@@ -140,6 +140,7 @@
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="blurtest.cpp" />
     <ClCompile Include="FrameBuffer.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Geometry.cpp" />
@@ -150,11 +151,19 @@
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="blur.fs" />
+    <None Include="bufferbloom.fs" />
+    <None Include="strawberry.fs" />
     <Text Include="SimpleFragmentShader.fs">
       <FileType>Document</FileType>
     </Text>
+    <None Include="churningwaves.fs" />
+    <None Include="flowingbark.fs" />
     <None Include="FrameBuffer.fs" />
     <None Include="FrameBuffer.vs" />
+    <None Include="moon2.fs" />
+    <None Include="moonburst.fs" />
+    <None Include="p3moon.fs" />
     <None Include="purplegrass.fs" />
     <None Include="redcrack.fs" />
     <None Include="SelectiveDesat.fs" />
