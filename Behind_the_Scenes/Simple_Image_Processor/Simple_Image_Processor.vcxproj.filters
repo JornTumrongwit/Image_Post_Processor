@@ -109,6 +109,15 @@
     <None Include="blur.fs">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="leaf.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="shrub.fs">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="demo.fs">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="SimpleFragmentShader.fs">

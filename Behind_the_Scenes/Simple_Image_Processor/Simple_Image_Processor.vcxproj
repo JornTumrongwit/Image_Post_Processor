@@ -153,6 +153,9 @@
   <ItemGroup>
     <None Include="blur.fs" />
     <None Include="bufferbloom.fs" />
+    <None Include="demo.fs" />
+    <None Include="leaf.fs" />
+    <None Include="shrub.fs" />
     <None Include="strawberry.fs" />
     <Text Include="SimpleFragmentShader.fs">
       <FileType>Document</FileType>

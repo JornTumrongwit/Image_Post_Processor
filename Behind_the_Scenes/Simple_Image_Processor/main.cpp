@@ -23,12 +23,12 @@ int display_width = 1500;
 int display_height = 1000;
 
 bool saved = false;
-bool bloom = true;
+bool bloom = false;
 
 float aspectRatio = SCR_WIDTH / SCR_HEIGHT; 
 
-const char* img = "./img/strawberry.jpg";
-const char* target = "./imgresult/strawberry.png";
+const char* img = "./img/mushrooms.jpg";
+const char* target = "./imgresult/crackeddirt.png";
 
 int* buffer = new int[SCR_WIDTH * SCR_HEIGHT * 3];
 unsigned int quadVAO, quadVBO;
@@ -79,7 +79,7 @@ int main()
     geoms.BindQuad(&quadVAO, &quadVBO);
 
     Shader ourShader = Shader();
-    ourShader.LinkShaders("SimpleVertexShader.vs", "strawberry.fs");
+    ourShader.LinkShaders("SimpleVertexShader.vs", "moonburst.fs");
     Shader frameShader = Shader();
     frameShader.LinkShaders("FrameBuffer.vs", "FrameBuffer.fs");
     Shader shaderBlur = Shader();
@@ -163,7 +163,6 @@ int main()
                 if (first_iteration) first_iteration = false;
             }
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            std::cout << pingpongFBO[0] << " " << pingpongFBO[1]<<"\n";
         }
         
         // second pass
@@ -211,19 +210,63 @@ void processInput(GLFWwindow* window, unsigned int framebuffer, Shader ourShader
 // --------------
 void SaveImage(GLFWwindow* window, unsigned int framebuffer, Shader ourShader, unsigned int VAO, unsigned int texture1)
 {
+    // buffer for blooms
+    // -----------------
+    unsigned int ppFBO[2];
+    unsigned int ppBuffer[2];
+    if (bloom == true) {
+        glGenFramebuffers(2, ppFBO);
+        glGenTextures(2, ppBuffer);
+        for (unsigned int i = 0; i < 2; i++)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, ppFBO[i]);
+            glBindTexture(GL_TEXTURE_2D, ppBuffer[i]);
+            glTexImage2D(
+                GL_TEXTURE_2D, 0, GL_RGBA16F, SCR_WIDTH, SCR_HEIGHT, 0, GL_RGBA, GL_FLOAT, NULL
+            );
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glFramebufferTexture2D(
+                GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ppBuffer[i], 0
+            );
+        }
+    }
     std::cout << "saving...\n";
     saved = true;
-
+    Shader sb = Shader();
+    if (bloom == true) {
+        sb.LinkShaders("FrameBuffer.vs", "blur.fs");
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
     glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
     // render
     // clear the colorbuffer
+    //pingpong
+    bool horizontal = true, first_iteration = true;
+        // if we are applying bloom
+    if (bloom == true) {
+        int amount = 10;
+        sb.use();
+        for (unsigned int i = 0; i < amount; i++)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, ppFBO[horizontal]);
+            glBindTexture(
+                GL_TEXTURE_2D, first_iteration ? texture1 : ppBuffer[!horizontal]
+            );
+            drawQuads();
+            horizontal = !horizontal;
+            if (first_iteration) first_iteration = false;
+        }
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     // render the triangle
     ourShader.use();
     glBindVertexArray(VAO);
-    glBindTexture(GL_TEXTURE_2D, texture1);
+    glBindTexture(GL_TEXTURE_2D, bloom ? ppBuffer[!horizontal] : texture1);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 
